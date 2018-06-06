@@ -17,7 +17,7 @@
 ############################  SETUP PARAMETERS
 app_name='spf13-vim'
 [ -z "$APP_PATH" ] && APP_PATH="$HOME/.spf13-vim-3"
-[ -z "$REPO_URI" ] && REPO_URI='https://github.com/spf13/spf13-vim.git'
+[ -z "$REPO_URI" ] && REPO_URI='https://github.com/imbakn/spf13-vim.git'
 [ -z "$REPO_BRANCH" ] && REPO_BRANCH='3.0'
 debug_mode='0'
 fork_maintainer='0'
@@ -122,8 +122,6 @@ create_symlinks() {
     local target_path="$2"
 
     lnif "$source_path/.vimrc"         "$target_path/.vimrc"
-    lnif "$source_path/.vimrc.bundles" "$target_path/.vimrc.bundles"
-    lnif "$source_path/.vimrc.before"  "$target_path/.vimrc.before"
     lnif "$source_path/.vim"           "$target_path/.vim"
 
     if program_exists "nvim"; then
@@ -131,31 +129,11 @@ create_symlinks() {
         lnif "$source_path/.vimrc"     "$target_path/.config/nvim/init.vim"
     fi
 
-    touch  "$target_path/.vimrc.local"
-
     ret="$?"
     success "Setting up vim symlinks."
     debug
 }
 
-setup_fork_mode() {
-    local source_path="$2"
-    local target_path="$3"
-
-    if [ "$1" -eq '1' ]; then
-        touch "$target_path/.vimrc.fork"
-        touch "$target_path/.vimrc.bundles.fork"
-        touch "$target_path/.vimrc.before.fork"
-
-        lnif "$source_path/.vimrc.fork"         "$target_path/.vimrc.fork"
-        lnif "$source_path/.vimrc.bundles.fork" "$target_path/.vimrc.bundles.fork"
-        lnif "$source_path/.vimrc.before.fork"  "$target_path/.vimrc.before.fork"
-
-        ret="$?"
-        success "Created fork maintainer files."
-        debug
-    fi
-}
 
 setup_vundle() {
     local system_shell="$SHELL"
@@ -191,16 +169,13 @@ sync_repo       "$APP_PATH" \
 create_symlinks "$APP_PATH" \
                 "$HOME"
 
-setup_fork_mode "$fork_maintainer" \
-                "$APP_PATH" \
-                "$HOME"
 
 sync_repo       "$HOME/.vim/bundle/vundle" \
                 "$VUNDLE_URI" \
                 "master" \
                 "vundle"
 
-setup_vundle    "$APP_PATH/.vimrc.bundles.default"
+setup_vundle    "$APP_PATH/.vimrc.bundles"
 
 msg             "\nThanks for installing $app_name."
 msg             "© `date +%Y` http://vim.spf13.com/"
